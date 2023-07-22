@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Minimalist Platformer</title>
+				<link href="css.css" rel="stylesheet">
+		<script src="minimalist-platformer.min.js"></script>
+	</head>
+	<body id=body style="width:100%;position:fixed;top:0px;bottom:0px;margin:0px;background-color:#DDD;font-family: 'Press Start 2P', cursive;">
+		<div id="instructions" style="white-space:pre;width:100%;height:100%;">
+Minimalist Platformer
+A     : Move Left
+D     : Move Right
+Space : Jump
+
+Enter : Start Game / Reset Level
+P     : Pause Game
+N     : Skip Level
+		</div>
+		<canvas id="canvas" style="z-index:1;"></canvas>
+		<div id="header" style="display:none;">
+			<div style="">
+				Timer:<span id="timer">00</span>
+			</div>
+			<div style="">
+				Keys:<span id="keys">00</span>
+			</div>
+			<div style="">
+				Room:<span id="room">00</span>
+			</div>
+		</div>
+		<div id=debug style="position:absolute;top:0px;right:0px;font-size:12px;text-align:right;z-index:1000;background:#FFF;"></div>
+
+		<script id=vertex type=vertexShader>
+			attribute vec2 aVertexPosition;
+			attribute vec4 aColor;
+			attribute vec3 aEntityPosition;
+
+
+			uniform vec2 pCamera;
+			uniform mat4 pMatrix;
+			varying vec4 vColor;
+
+			void main() {
+				gl_Position = pMatrix *  vec4(aVertexPosition + aEntityPosition.xy + (pCamera*aEntityPosition.z), 0.0, 1.0);
+				vColor = aColor;
+			}
+		</script>
+
+
+
+		<script id=fragment type=fragmentShader>
+			#ifdef GL_ES
+			precision highp float;
+			#endif
+
+			varying vec4 vColor;
+
+			void main() {
+
+				vec4 color = vColor;
+				color.rgb *= color.a;
+				gl_FragColor = color;
+			}
+		</script>
+
+		<script id=vertexUV type=vertexShader>
+			attribute vec2 aVertexPosition;
+			attribute vec2 aUVPosition;
+			attribute vec4 aColor;
+			attribute vec3 aEntityPosition;
+
+
+			uniform vec2 pCamera;
+			uniform mat4 pMatrix;
+			varying vec4 vColor;
+			varying vec2 vUV;
+
+			void main() {
+				gl_Position = pMatrix *  vec4(aVertexPosition + aEntityPosition.xy + (pCamera*aEntityPosition.z), 0.0, 1.0);
+				vColor = aColor;
+				vUV = aUVPosition;
+			}
+		</script>
+
+		<script id=fragmentUV type=fragmentShader>
+			#ifdef GL_ES
+			precision highp float;
+			#endif
+
+			uniform sampler2D Sampler;
+			varying vec4 vColor;
+			varying vec2 vUV;
+
+			void main() {
+				gl_FragColor = vec4(texture2D(Sampler, vUV).rgb, 1.0);
+			}
+		</script>
+
+		<script>
+			initGame();
+		</script>
+
+	</body>
+
+</html>

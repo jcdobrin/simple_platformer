@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Minimalist Platformer</title>
+		<link href="css.css" rel="stylesheet">
+		<script src="Math.js?1"></script>
+		<script src="Inputs.js?1"></script>
+		<script src="CanvasRender.js?1"></script>
+		<script src="OpenGlRender.js?2"></script>
+		<script src="SoundEffects.js?2"></script>
+
+		<script src="Collision.js?12"></script>
+		<script src="Floor.js?12"></script>
+		<script src="Door.js?12"></script>
+		<script src="Player.js?14"></script>
+		<script src="Key.js?12"></script>
+		<script src="Levels.js"></script>
+		<script src="TrainingLevels.js"></script>
+		<script src="FireLevels.js"></script>
+		<script src="Entity.js?16"></script>
+		<script src="Audio.js?13"></script>
+		<script src="Game.js?12"></script>
+		<script src="RenderElements.js?1"></script>
+		<script src="Camera.js"></script>
+	</head>
+	<body id=body style="width:100%;position:fixed;top:0px;bottom:0px;margin:0px;background-color:#DDD;font-family: 'Press Start 2P', cursive;">
+		<div id="instructions" style="white-space:pre;width:100%;height:100%;">
+Minimalist Platformer
+A     : Move Left
+D     : Move Right
+Space : Jump
+
+Enter : Start Game / Reset Level
+P     : Pause Game
+N     : Skip Level
+		</div>
+		<canvas id="canvas" style="z-index:1;"></canvas>
+		<div id="header" style="display:none;">
+			<div style="">
+				Timer:<span id="timer">00</span>
+			</div>
+			<div style="">
+				Keys:<span id="keys">00</span>
+			</div>
+			<div style="">
+				Room:<span id="room">00</span>
+			</div>
+		</div>
+		<div id=debug style="position:absolute;top:0px;right:0px;font-size:12px;text-align:right;z-index:1000;background:#FFF;"></div>
+
+		<script id=vertex type=vertexShader>
+			attribute vec2 aVertexPosition;
+			attribute vec4 aColor;
+			attribute vec3 aEntityPosition;
+
+
+			uniform vec2 pCamera;
+			uniform mat4 pMatrix;
+			varying vec4 vColor;
+
+			void main() {
+				gl_Position = pMatrix *  vec4(aVertexPosition + aEntityPosition.xy + (pCamera*aEntityPosition.z), 0.0, 1.0);
+				vColor = aColor;
+			}
+		</script>
+
+
+
+		<script id=fragment type=fragmentShader>
+			#ifdef GL_ES
+			precision highp float;
+			#endif
+
+			varying vec4 vColor;
+
+			void main() {
+
+				vec4 color = vColor;
+				color.rgb *= color.a;
+				gl_FragColor = color;
+			}
+		</script>
+
+		<script id=vertexUV type=vertexShader>
+			attribute vec2 aVertexPosition;
+			attribute vec2 aUVPosition;
+			attribute vec4 aColor;
+			attribute vec3 aEntityPosition;
+
+
+			uniform vec2 pCamera;
+			uniform mat4 pMatrix;
+			varying vec4 vColor;
+			varying vec2 vUV;
+
+			void main() {
+				gl_Position = pMatrix *  vec4(aVertexPosition + aEntityPosition.xy + (pCamera*aEntityPosition.z), 0.0, 1.0);
+				vColor = aColor;
+				vUV = aUVPosition;
+			}
+		</script>
+
+		<script id=fragmentUV type=fragmentShader>
+			#ifdef GL_ES
+			precision highp float;
+			#endif
+
+			uniform sampler2D Sampler;
+			varying vec4 vColor;
+			varying vec2 vUV;
+
+			void main() {
+				gl_FragColor = vec4(texture2D(Sampler, vUV).rgb, 1.0);
+			}
+		</script>
+
+		<script>
+			initGame();
+		</script>
+
+			<!--
+	 Publications writes:
+
+	Dungeon Dweller for the Atari 2600 offers the most sophisticated experience yet seen
+	on the home video computer system. Gripping action and high gear excite, get ready for
+	the adventure of a lifetime. One Player. Use with Joystick and Paddle Controllers.
+	-- Ian Gimly  March, 1981
+
+	Note: Have hard levels that have extra keys. Those can be carried until you die. Have later level
+	that requires more keys then in the level, requiring a bonus key(s) to access the stage.
+
+	-->
+
+	</body>
+</html>

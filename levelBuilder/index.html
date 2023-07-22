@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Level Builder</title>
+		<link href="../src/css.css" rel="stylesheet">
+		<script src="../src/Math.js?1"></script>
+		<script src="Inputs.js"></script>
+		<script src="../src/CanvasRender.js?1"></script>
+		<script src="../src/OpenGlRender.js?1"></script>
+
+		<script src="../src/Collision.js?12"></script>
+		<script src="../src/Floor.js?12"></script>
+		<script src="../src/Door.js?12"></script>
+		<script src="../src/Player.js?14"></script>
+		<script src="../src/Key.js?12"></script>
+		<script src="../src/Levels.js"></script>
+		<script src="../src/Entity.js?16"></script>
+		<script src="../src/Audio.js?13"></script>
+		<script src="../src/Game.js?12"></script>
+
+		<script src="../src/RenderElements.js?1"></script>
+		<script src="../src/Camera.js"></script>
+		<script src="LevelBuilder.js"></script>
+	</head>
+	<body id=body style="width:100%;position:fixed;top:0px;bottom:0px;margin:0px;background-color:#DDD;font-family: 'Press Start 2P', cursive;">
+		<canvas id="canvas" style="z-index:1;"></canvas>
+		<div id="header" style="display:none;">
+			<div style="">
+				Timer:<span id="timer">00</span>
+			</div>
+			<div style="">
+				Keys:<span id="keys">00</span>
+			</div>
+			<div style="">
+				Room:<span id="room">00</span>
+			</div>
+		</div>
+		<div id=debug style="position:absolute;top:0px;right:0px;font-size:12px;text-align:right;z-index:1000;background:#FFF;"></div>
+
+		<script id=vertex type=vertexShader>
+			attribute vec2 aVertexPosition;
+			attribute vec4 aColor;
+			uniform vec2 entityPosition;
+			uniform mat4 pMatrix;
+
+			varying vec4 vColor;
+
+			void main() {
+				gl_Position = pMatrix *  vec4((aVertexPosition+entityPosition), 0.0, 1.0);
+				vColor = aColor;
+			}
+		</script>
+
+		<script id=fragment type=fragmentShader>
+			#ifdef GL_ES
+			precision highp float;
+			#endif
+
+			uniform vec4 uColor;
+			uniform bool useVColor;
+
+			varying vec4 vColor;
+
+			void main() {
+
+				vec4 color = uColor;
+				if(useVColor)
+				{
+					color = vColor;
+
+				}
+				color.rgb *= color.a;
+				gl_FragColor = color;
+			}
+		</script>
+
+		<script>
+			initGame();
+			GameLoop();
+		</script>
+
+	</body>
+</html>
